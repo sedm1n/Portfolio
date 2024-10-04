@@ -1,0 +1,1 @@
+##Учебный проект в котором будут использованы: django, celery, redis, posgresql
