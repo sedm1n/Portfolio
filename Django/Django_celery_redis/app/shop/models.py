@@ -65,8 +65,8 @@ class Category(models.Model):
         super().save(*args, **kwargs)
 
 
-#     def get_absolute_url(self):
-#         return reverse("shop:category", kwargs={"slug": self.slug})
+    def get_absolute_url(self):
+        return reverse("shop:category_list", kwargs={"slug": self.slug})
 
 
 class Product(models.Model):
@@ -77,7 +77,7 @@ class Product(models.Model):
     """
 
     title = models.CharField(verbose_name="Название", max_length=150, db_index=True)
-    brang = models.CharField(verbose_name="Бренд", max_length=150)
+    brand = models.CharField(verbose_name="Бренд", max_length=150)
     description = models.TextField(verbose_name="Описание")
 
     category = models.ForeignKey(
@@ -107,8 +107,8 @@ class Product(models.Model):
         return self.title
 
 
-#     def get_absolute_url(self):
-#         return reverse("shop:product", kwargs={"slug": self.slug})
+    def get_absolute_url(self):
+        return reverse("shop:product_detail", kwargs={"slug": self.slug})
 
 
 class ProductManager(models.Manager):

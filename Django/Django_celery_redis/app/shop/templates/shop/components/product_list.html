@@ -1,4 +1,4 @@
-{% load thumbnail%}
+{% comment %} {% load thumbnail%} {% endcomment %}
 {% for product in products %}
 
 {% if forloop.last %}
@@ -9,9 +9,9 @@
         {% endif %}
         <a class="text-black text-decoration-none fs-4" href="{{product.get_absolute_url}}">
             <div class="card shadow-sm h-100">
-                {% thumbnail product.image "400x400" as im %}
+                {% comment %} {% thumbnail product.image "400x400" as im %} {% endcomment %}
                 <img class="img-fluid h-100" alt="Responsive image" src="{{ im.url }}" />
-                {% endthumbnail %}
+                {% comment %} {% endthumbnail %} {% endcomment %}
                 <div class="card-body">
                     <p class="card-text">
                         {{product.title|capfirst}}

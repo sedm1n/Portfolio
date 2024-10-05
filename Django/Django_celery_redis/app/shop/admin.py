@@ -13,7 +13,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-      list_display = ['title','brang','slug','price','available', 'created_at', 'updated_at']
+      list_display = ['title','brand','slug','price','available', 'created_at', 'updated_at']
       ordering = ['title']
       list_filter = ['available', 'created_at', 'updated_at']
  
@@ -21,4 +21,3 @@ class ProductAdmin(admin.ModelAdmin):
             return {'slug': ('title',)}
       
 
-      

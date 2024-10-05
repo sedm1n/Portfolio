@@ -98,7 +98,7 @@
 
     <br>
 
-    {% include 'recommend/recommendation.html' %}
+    {% comment %} {% include 'recommend/recommendation.html' %} {% endcomment %}
 
 </div>
 
@@ -108,7 +108,7 @@
 
         $.ajax({
             type: 'POST',
-            url: '{% url "cart:add-to-cart" %}',
+            url: '',
             data: {
                 product_id: $('#add-button').val(),
                 product_qty: $('#select option:selected').text(),
