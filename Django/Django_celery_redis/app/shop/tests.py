@@ -1,5 +1,4 @@
-from ast import List
-from django.template.defaultfilters import first
+
 from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
