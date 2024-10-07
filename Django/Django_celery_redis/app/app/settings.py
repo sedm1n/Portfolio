@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     # custom
     'shop.apps.ShopConfig',
     'cart.apps.CartConfig',
+    'accounts.apps.AccountsConfig',
 ]
 
 MIDDLEWARE = [
