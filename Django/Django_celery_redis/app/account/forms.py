@@ -7,6 +7,7 @@ from django.forms.widgets import PasswordInput, TextInput
 User = get_user_model()
 
 class UserCreationForm(UserCreationForm):
+
       class Meta:
             model = User
             fields = ('username', 'email', 'password1', 'password2')
@@ -24,3 +25,7 @@ class UserCreationForm(UserCreationForm):
             if User.objects.filter(email=email).exists() and len(email) > 254:
                   raise forms.ValidationError("Email already exists or to long") 
             return email
+      
+class LoginForm(AuthenticationForm):
+      username = forms.CharField(widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}))
+      password = forms.CharField(widget=PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}))

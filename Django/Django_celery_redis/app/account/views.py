@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 
 from django_email_verification import send_email
 
-from .forms import UserCreationForm
+from .forms import LoginForm, UserCreationForm
 
 User = get_user_model()
 
@@ -23,7 +23,34 @@ def register_view(request):
                   user.is_active = False
                   send_email(user)
                   
-                  # return redirect('account:login')
+                  return redirect('account:email_verification_sent')
       else:
             form = UserCreationForm()
       return render(request, 'account/registration/register.html', {'form': form})
+
+def user_login_view(request):
+
+      form = LoginForm(request.POST)
+      if request.user.is_authenticated:
+            return redirect('account:dashboard')
+            
+      if request.method == 'POST':
+
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                  login(request, user)
+                  return redirect('account:dashboard')
+            else:
+                  messages.info(request, 'Username or password is incorrect')
+                  redirect('account:login')
+
+      context = {'form': form}
+
+      return render(request, 'account/login/login.html', context)
+
+@login_required
+def user_logout_view(request):
+      logout(request)
+      return redirect('account:login')

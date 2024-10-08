@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import environ
 
+env = environ.Env()
+env.read_env('.env')
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -144,3 +147,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+def email_verified_callback(user):
+    user.is_active = True
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_FROM_ADDRESS = 'XHqFP@example.com'
+EMAIL_PAGE_DOMAIN = 'http://127.0.0.1:8000/'
+EMAIL_MAIL_TOKEN_LIFE = 3600
+
+EMAIL_MAIL_SUBJECT = 'Django E-mail verification'
+EMAIL_MAIL_HTML = 'account/email/body_mail.html'
+EMAIL_MAIL_PLAIN = 'account/email/body_mail.txt'
+
+# Email Verification Settings (mandatory for builtin view)
+EMAIL_MAIL_PAGE_TEMPLATE = 'account/email/email_success_template.html'
+EMAIL_MAIL_CALLBACK = email_verified_callback
