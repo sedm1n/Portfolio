@@ -29,3 +29,18 @@ class UserCreationForm(UserCreationForm):
 class LoginForm(AuthenticationForm):
       username = forms.CharField(widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}))
       password = forms.CharField(widget=PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}))
+
+class UserUpdateForm(forms.ModelForm):
+      email = forms.EmailField(required=True)
+
+      def __init__(self, *args, **kwargs):
+
+            super(UserUpdateForm, self).__init__(*args, **kwargs)
+
+            self.fields['username'].help_text = ""
+            self.fields['email'].label = "Your email address"
+      
+      class Meta:
+            model = User
+            fields = ['username', 'email']
+            exclude = ['password1', 'password2']

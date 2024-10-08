@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 
 from django_email_verification import send_email
 
-from .forms import LoginForm, UserCreationForm
+from .forms import LoginForm, UserCreationForm, UserUpdateForm
 
 User = get_user_model()
 
@@ -31,9 +31,9 @@ def register_view(request):
 def user_login_view(request):
 
       form = LoginForm(request.POST)
-      if request.user.is_authenticated:
-            return redirect('account:dashboard')
             
+      if request.user.is_authenticated:
+            return redirect('shop:products')
       if request.method == 'POST':
 
             username = request.POST.get('username')
@@ -54,3 +54,32 @@ def user_login_view(request):
 def user_logout_view(request):
       logout(request)
       return redirect('account:login')
+
+@login_required
+def dashboard_view(request):
+      
+      return render(request, 'account/dashboard/dashboard.html')
+
+@login_required
+def profile_manegment_view(request):
+      form = UserUpdateForm(request.POST, instance=request.user)
+      if request.method == 'POST':
+            
+            if form.is_valid():
+                  form.save()
+                  messages.success(request, 'Profile updated successfully')
+                  return redirect('account:dashboard')
+
+      context = {'form': form}
+      return render(request, 'account/dashboard/profile-management.html', context)
+
+@login_required
+def delete_user_view(request):
+      user = User.objects.get(id=request.user.id)
+      if request.method == 'POST':
+            user.delete()
+            user.save()
+      
+
+      messages.success(request, 'Account deleted successfully')
+      return render(request, 'account/login/login.html')
