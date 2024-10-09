@@ -7,7 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.conf import settings
-from yookassa import Payment
+
+from yookassa import Payment, Configuration as yoo_config
 
 from .forms import ShippingAdressForm
 from .models import Order, OrderItem, ShippingAdress
@@ -16,6 +17,8 @@ from .models import Order, OrderItem, ShippingAdress
 stripe.api_key = settings.STRIPE_SECRET_KEY
 stripe.api_version = settings.STRIPE_API_VERSION
 
+yoo_config.account_id = settings.YOOKASSA_SHOP_ID
+yoo_config.secret_key = settings.YOOKASSA_SECRET_KEY
 
 
 
