@@ -25,23 +25,23 @@ urlpatterns = [
       path('password-reset/',
            auth_views.PasswordResetView.as_view(
                success_url=reverse_lazy('account:password_reset_done'),
-               template_name='account/password/password_reset_form.html',
-               email_template_name='account/password/password_reset_email.html'
+               template_name='account/password/password-reset.html',
+               email_template_name='account/password/password-reset-email.html'
            ), name='password-reset'),
 
       path('password-reset/done/',
            auth_views.PasswordResetDoneView.as_view(
-               template_name='account/password/password_reset_done.html'
+               template_name='account/password/password-reset-done.html'
            ), name='password-reset-done'),
 
       path('password-reset-confirm/<uidb64>/<token>/',
            auth_views.PasswordResetConfirmView.as_view(
                success_url=reverse_lazy('account:password_reset_complete'),
-               template_name='account/password/password_reset_confirm.html'
+               template_name='account/password/password-reset-confirm.html'
            ), name='password-reset-confirm'),
 
       path('password-reset-complete/',
            auth_views.PasswordResetCompleteView.as_view(
-               template_name='account/password/password_reset_complete.html'
+               template_name='account/password/password-reset-complete.html'
            ), name='password-reset-complete'),
 ]
