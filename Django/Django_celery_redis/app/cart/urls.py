@@ -8,4 +8,5 @@ urlpatterns = [
       path('add/', cart_add, name="add_to_cart"),
       path('delete/', cart_delete, name="delete-to-cart"),
       path('update/', cart_update, name="update-to-cart"),
+      
       ]

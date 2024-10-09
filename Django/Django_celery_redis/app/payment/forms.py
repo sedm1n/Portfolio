@@ -16,4 +16,4 @@ class ShippingAdressForm(forms.ModelForm):
             "zip",
         ]
         exclude = ["user"]
-        
+
