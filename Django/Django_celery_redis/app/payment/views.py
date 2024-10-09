@@ -1,9 +1,22 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+import uuid
+from decimal import Decimal
+
+import stripe
 from cart.cart import Cart
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.conf import settings
+from yookassa import Payment
+
 from .forms import ShippingAdressForm
-from .models import ShippingAdress, Order, OrderItem
+from .models import Order, OrderItem, ShippingAdress
+
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+stripe.api_version = settings.STRIPE_API_VERSION
+
+
 
 
 def chekout_view(request):
@@ -16,63 +29,105 @@ def chekout_view(request):
     return render(request, "payment/chekout.html")
 
 
-def complete_order_view(request):
-    
-    if request.POST.get("action") == "payment":
-        name = request.POST.get("name")
-        email = request.POST.get("email")
-        street_address = request.POST.get("address1")
-        apartment_address = request.POST.get("address2")
-        country = request.POST.get("country")
-        zipcode = request.POST.get("zipcode")
+def create_order(cart, user, shipping_address, total_price):
+    """Создание заказа и элементов заказа."""
+    if user.is_authenticated:
+        order = Order.objects.create(user=user, shipping_address=shipping_address, amount=total_price)
+    else:
+        order = Order.objects.create(shipping_address=shipping_address, amount=total_price)
 
+    for item in cart:
+        OrderItem.objects.create(
+            order=order,
+            product=item['product'],
+            price=item['price'],
+            quantity=item['qty'],
+            user=user if user.is_authenticated else None
+        )
+    
+    return order
+
+def prepare_stripe_session(cart, total_price, request, order_id):
+    """Подготовка данных для Stripe-сессии."""
+    session_data = {
+        'mode': 'payment',
+        'success_url': request.build_absolute_uri(reverse('payment:payment-success')),
+        'cancel_url': request.build_absolute_uri(reverse('payment:payment-failed')),
+        'line_items': []
+    }
+
+    for item in cart:
+        session_data['line_items'].append({
+            'price_data': {
+                'unit_amount': int(item['price'] * Decimal(100)),
+                'currency': 'usd',
+                'product_data': {
+                    'name': item['product']
+                },
+            },
+            'quantity': item['qty'],
+        })
+
+    session_data['client_reference_id'] = order_id
+    return stripe.checkout.Session.create(**session_data)
+
+def prepare_yookassa_payment(total_price, request):
+    """Подготовка данных для платежа через YooKassa."""
+    idempotence_key = uuid.uuid4()
+
+    payment = Payment.create({
+        "amount": {
+            "value": str(total_price * 93),  # Можно добавить логику для конвертации валюты
+            "currency": 'RUB'
+        },
+        "confirmation": {
+            "type": "redirect",
+            "return_url": request.build_absolute_uri(reverse('payment:payment-success')),
+        },
+        "capture": True,
+        "test": True,
+        "description": 'Товары в корзине',
+    }, idempotence_key)
+
+    return payment.confirmation.confirmation_url
+
+def complete_order_view(request):
+    if request.method == 'POST':
+        payment_type = request.POST.get('stripe-payment', 'yookassa-payment')
+
+        # Получение данных формы
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        street_address = request.POST.get('street_address')
+        apartment_address = request.POST.get('apartment_address')
+        country = request.POST.get('country')
+        zip = request.POST.get('zip')
         cart = Cart(request)
         total_price = cart.get_total_price()
+
+        # Получение или создание адреса доставки
         shipping_address, _ = ShippingAdress.objects.get_or_create(
             user=request.user,
             defaults={
-                "full_name": name,
-                "email": email,
-                "street_adress": street_address,
-                "apartment_adress": apartment_address,
-                "country": country,
-                "zip": zipcode,
-            },
+                'name': name,
+                'email': email,
+                'street_address': street_address,
+                'apartment_address': apartment_address,
+                'country': country,
+                'zip': zip
+            }
         )
-        
-        if request.user.is_authenticated:
-            order = Order.objects.create(
-                user=request.user, shipping_address=shipping_address, amount=total_price
-            )
-        
-            for item in cart:
-                  OrderItem.objects.create(
-                  order=order,
-                  product=item["product"],
-                  price=item["price"],
-                  quantity=item["qty"],
-                  user = request.user
-                  )
-        else:
-            order = Order.objects.create(
-                shipping_address=shipping_address, amount=total_price
-            )
-            for item in cart:
-                  OrderItem.objects.create(
-                  order=order,
-                  product=item["product"],
-                  price=item["price"],
-                  quantity=item["qty"],
-                  
-                  )
 
+        # Обработка различных методов оплаты
+        if payment_type == "stripe-payment":
+            order = create_order(cart, request.user, shipping_address, total_price)
+            session = prepare_stripe_session(cart, total_price, request, order.id)
+            return redirect(session.url, code=303)
 
-        
-        return JsonResponse({"success": True})
-    else:
-        print("get")
-        return JsonResponse({"success": False})  
-#     return render(request, "payment/complete_order.html")
+        elif payment_type == "yookassa-payment":
+            order = create_order(cart, request.user, shipping_address, total_price)
+            confirmation_url = prepare_yookassa_payment(total_price, request)
+            return redirect(confirmation_url)
 
 
 def payment_success_view(request):
