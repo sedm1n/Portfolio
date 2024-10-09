@@ -164,3 +164,7 @@ EMAIL_MAIL_PLAIN = 'account/email/body_mail.txt'
 # Email Verification Settings (mandatory for builtin view)
 EMAIL_MAIL_PAGE_TEMPLATE = 'account/email/email_success_template.html'
 EMAIL_MAIL_CALLBACK = email_verified_callback
+
+STRIPE_PUBLISHEBLE_KEY = env("STRIPE_PUBLISHEBLE_KEY")
+STRIPE_SECRET_KEY = env("STRIPE_SECRET_KEY")
+STRIPE_API_VERSION = env("STRIPE_API_VERSION")
