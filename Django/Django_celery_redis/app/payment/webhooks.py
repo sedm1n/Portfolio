@@ -1,3 +1,4 @@
+import json
 import stripe
 from django.conf import settings
 from django.http import HttpResponse
@@ -10,7 +11,7 @@ from yookassa.domain.notification import (
 )
 
 from .models import Order
-from .tasks import send_order_confirmation
+# from .tasks import send_order_confirmation
 
 
 @csrf_exempt
