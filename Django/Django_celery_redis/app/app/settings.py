@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+
 import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -46,7 +47,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5', 
     'django_email_verification', 
-
+    'django_google_fonts',
     # custom
     'shop.apps.ShopConfig',
     'cart.apps.CartConfig',
@@ -69,7 +70,7 @@ ROOT_URLCONF = 'app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -135,6 +136,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "static"
+STATICFILES_DIRS = [BASE_DIR / "app/static"]
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
@@ -170,3 +173,6 @@ STRIPE_API_VERSION = env("STRIPE_API_VERSION")
 
 YOOKASSA_SECRET_KEY = env("YOOKASSA_SECRET_KEY")
 YOOKASSA_SHOP_ID = env("YOOKASSA_SHOP_ID")
+
+GOOGLE_FONTS = ["Montserrat:wght@300;400;500", "Roboto:wght@300;400;500"]
+GOOGLE_FONTS_DIR = BASE_DIR / "static"
