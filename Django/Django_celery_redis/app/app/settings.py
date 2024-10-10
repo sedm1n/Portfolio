@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'django_email_verification', 
     'django_google_fonts',
      'sorl.thumbnail',
+     'django_celery_results',
+     'django_celery_beat',
     # custom
     'shop.apps.ShopConfig',
     'cart.apps.CartConfig',
@@ -179,3 +181,11 @@ YOOKASSA_SHOP_ID = env("YOOKASSA_SHOP_ID")
 
 GOOGLE_FONTS = ["Montserrat:wght@300;400;500", "Roboto:wght@300;400;500"]
 GOOGLE_FONTS_DIR = BASE_DIR / "static"
+
+# celery
+
+CELERY_BROKER_URL = env("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND")
+CELERY_RESULT_EXTENDED = env("CELERY_RESULT_EXTENDED")
+CELERY_BROKER_CONNECTION_TIMEOUT_RETRY_ON_STARTUP = env("CELERY_BROKER_CONNECTION_TIMEOUT_RETRY_ON_STARTUP")
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
