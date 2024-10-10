@@ -12,7 +12,7 @@ urlpatterns = [
       path("payment_success/", views.payment_success_view, name="payment_success"),
       path("payment_fail/", views.payment_fail_view, name="payment_fail"),
       path("shipping/", views.shipping_view, name="shipping"),
-      path("webhook/", stripe_webhook, name="webhook"),
+      path("webhook-stripe/", stripe_webhook, name="webhook-stripe"),
       
 
 ]
