@@ -11,7 +11,7 @@ from yookassa.domain.notification import (
 )
 
 from .models import Order
-# from .tasks import send_order_confirmation
+from .tasks import send_order_confirmation
 
 
 @csrf_exempt
@@ -37,7 +37,8 @@ def stripe_webhook(request):
                 order_id = session.client_reference_id
             except Order.DoesNotExist:
                 return HttpResponse(status=404)
-
+        
+        send_order_confirmation.delay(order_id)
         order = Order.objects.get(id=order_id)
         order.paid = True
         order.save()
