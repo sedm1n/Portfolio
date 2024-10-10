@@ -57,10 +57,7 @@ def yookassa_webhook(request):
     webhook = Webhook(request.body, request.headers["Content-Type"])
     event = webhook.parse()
 
-    if event.type == "payment.succeeded":
-        return HttpResponse(status=200)
-
-    return HttpResponse(status=200)
+   
 
     ip = get_client_ip(request)
     if not SecurityHelper().is_ip_trusted(ip):

@@ -13,6 +13,6 @@ urlpatterns = [
       path("payment_fail/", views.payment_fail_view, name="payment_fail"),
       path("shipping/", views.shipping_view, name="shipping"),
       path("webhook-stripe/", stripe_webhook, name="webhook-stripe"),
-      
+      path("webhook-yookassa/", stripe_webhook, name="webhook-yookassa"),
 
 ]
