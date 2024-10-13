@@ -1,18 +1,22 @@
 import uuid
 from decimal import Decimal
 
+from django.templatetags import static
 import stripe
+import weasyprint
 from cart.cart import Cart
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
 from django.conf import settings
-
-from yookassa import Payment, Configuration as yoo_config
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
+from django.http import Http404, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
+from django.urls import reverse
+from yookassa import Configuration as yoo_config
+from yookassa import Payment
 
 from .forms import ShippingAdressForm
 from .models import Order, OrderItem, ShippingAdress
-
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 stripe.api_version = settings.STRIPE_API_VERSION
@@ -162,3 +166,18 @@ def shipping_view(request):
             return redirect("account:dashboard")
 
     return render(request, "payment/shipping/shipping.html", {"form": form})
+
+@staff_member_required
+def admin_order_pdf(request, order_id):
+    try:
+        order = Order.objects.select_related('user', 'shipping_address').get(id=order_id)
+    except Order.DoesNotExist:
+        raise Http404('Order not found')
+    html = render_to_string('payment/order/ pdf/pdf_invoice.html', {'order': order})
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'filename=order_{order.id}.pdf'
+    css_path = static('payment/css/pdf.css')
+    stylesheet = [weasprint.CSS(css_path)]
+    weasyprint.HTML(string=html).write_pdf(response, stylesheets=[stylesheet])
+    return response
