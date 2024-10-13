@@ -97,7 +97,7 @@ class Product(models.Model):
         verbose_name="Цена", max_digits=10, decimal_places=2, default=0.00
     )
 
-    image = models.ImageField("Изображение", upload_to="products/%Y/%m/%d", blank=True)
+    image = models.ImageField("Изображение", upload_to="images/products/%Y/%m/%d",default="images/products/default.jpg", blank=True)
     available = models.BooleanField("Доступен", default=True)
 
     created_at = models.DateTimeField(verbose_name="Создан", auto_now_add=True)
