@@ -26,8 +26,8 @@ class Command(BaseCommand):
                 price=product_price,
                 slug = fake.slug(),
                 available=True,
-                created = fake.date_time_this_year(),
-                updated = fake.date_time_this_year(),
+                created_at = fake.date_time_this_year(),
+                updated_at = fake.date_time_this_year(),
                 discount = fake.random_int(min=0, max=30),
             )
 

@@ -51,6 +51,7 @@ INSTALLED_APPS = [
      'sorl.thumbnail',
      'django_celery_results',
      'django_celery_beat',
+     'django_htmx',
     # custom
     'shop.apps.ShopConfig',
     'cart.apps.CartConfig',
@@ -66,6 +67,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_htmx.middleware.HtmxMiddleware',
 ]
 
 ROOT_URLCONF = 'app.urls'
