@@ -1,19 +1,12 @@
+from decimal import Decimal
 import random
 import string
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
 
 
-def rand_slug():
-    """
-    Generates a random slug for a model instance.
-
-    Returns a unique slug 3 characters long.
-    """
-    return "".join(
-        random.choice(string.ascii_lowercase + string.digits) for _ in range(3)
-    )
 
 
 class Category(models.Model):
@@ -53,6 +46,17 @@ class Category(models.Model):
             k = k.parent
         return " -> ".join(full_path[::-1])
 
+    def _rand_slug():
+        """
+            Generates a random slug for a model instance.
+
+            Returns a unique slug 3 characters long.
+        """
+        return "".join(
+        random.choice(string.ascii_lowercase + string.digits) for _ in range(3)
+            )
+
+
     def save(self, *args, **kwargs):
         """
         Save the category instance.
@@ -61,7 +65,7 @@ class Category(models.Model):
         and the `rand_slug` function. The slug is then saved to the database.
         """
         if not self.slug:
-            self.slug = slugify(rand_slug() + "-pickBetter" + self.name)
+            self.slug = slugify(self._rand_slug() + "-pickBetter" + self.name)
         super().save(*args, **kwargs)
 
 
@@ -98,10 +102,11 @@ class Product(models.Model):
 
     created_at = models.DateTimeField(verbose_name="Создан", auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name="Обновлен", auto_now=True)
-
+    discount  = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
     class Meta:
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
+        ordering = ["-created_at"]
 
     def __str__(self):
         return self.title
@@ -109,6 +114,14 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return reverse("shop:product_detail", kwargs={"slug": self.slug})
+    
+    def get_discounted_price(self):
+        discounted_price = self.price - (self.price * self.discount / Decimal(100))
+        return round(discounted_price, 2)
+    
+    @property
+    def full_image_url(self):
+        return self.image.url if self.image else ""
 
 
 class ProductManager(models.Manager):
